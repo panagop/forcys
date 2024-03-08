@@ -8,7 +8,7 @@ cm.subset(
   maximum_longitude=26.01,
   minimum_latitude=37.05,
   maximum_latitude=37.15,
-  start_datetime="1994-07-31T23:00:00",
+  start_datetime="2000-01-01T00:00:00",
   end_datetime="2024-02-29T23:00:00",
 
 )
