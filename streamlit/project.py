@@ -1,8 +1,8 @@
 ﻿import streamlit as st
 
-st.title('Forcstream')
+st.title('Forcys streamlit app')
 
-st.write('Welcome to Forcstream, a web app for visualizing and analyzing first-order reversal curve (FORC) data.')
+st.write('Welcome to Forcys streamlit app, a web app for visualizing and analyzing wave and wind data.')
 
-st.write('To get started, please upload your FORC data file in .csv format.')
+
 
