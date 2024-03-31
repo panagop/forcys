@@ -53,33 +53,30 @@ if radio_selection == 'Map plot':
         st.write(f'{selected_variable}: {myvar.long_name}')
         myvar_array = myvar.values  # Reads the netCDF variable MT, array of one element
 
-        st.write('Start Time:', timestring(wdf.time[0]))
-        st.write('End Time:', timestring(wdf.time[-1]))
+        st.write('Start Time:', wdf.datetime[0])
+        st.write('End Time:', wdf.datetime[-1])
 
         if len(wdf.time) > 1:
             selected_date = st.slider('Select a date',
-                                    min_value=datetime.fromtimestamp(
-                                        wdf.time[0]),
-                                    max_value=datetime.fromtimestamp(wdf.time[-1]))
+                                    min_value=wdf.datetime[0],
+                                    max_value=wdf.datetime[-1])
             
             selected_hour = st.slider(
                 'Select a time', min_value=0, max_value=23, value=0)
             selected_datetime = datetime(
                 selected_date.year, selected_date.month,
                 selected_date.day, selected_hour, 0)
-            if selected_datetime > datetime.fromtimestamp(wdf.time[-1]):
-                selected_datetime = datetime.fromtimestamp(wdf.time[-1])
-            if selected_datetime < datetime.fromtimestamp(wdf.time[0]):
-                selected_datetime = datetime.fromtimestamp(wdf.time[0])
+            if selected_datetime > wdf.datetime[-1]:
+                selected_datetime = wdf.datetime[-1]
+            if selected_datetime < wdf.datetime[0]:
+                selected_datetime = wdf.datetime[0]
         else:
-            selected_datetime = datetime.fromtimestamp(wdf.time[0])
+            selected_datetime = wdf.datetime[0]
 
+        # st.write(f'Selected time: {selected_datetime}')
 
-
-        timestamp = datetime.timestamp(selected_datetime)
-
-        # time_index = 500
-        time_index = np.where(wdf.time == timestamp)[0][0]
+        time_index = np.where(wdf.datetime == selected_datetime)[0][0]
+        # st.write(f'Time index: {time_index}')
 
         # Create a figure and axis object
         fig, ax = plt.subplots(figsize=(8, 5))
@@ -89,7 +86,7 @@ if radio_selection == 'Map plot':
         ax.set_ylabel("Latitude")
         ax.set_title(
             f"{myvar.long_name} ({selected_variable}) - \
-                {timestring(wdf.time[time_index])}")
+                {wdf.datetime[time_index]}")
 
         # Create a contour plot
         contourf = ax.contourf(np.array(wdf.lon), np.array(
@@ -115,9 +112,14 @@ if radio_selection == 'Time series':
         selected_lon = st.select_slider('Select longitude', wdf.lon)
         multivariables = st.multiselect('Select variables', wdf.variables)
 
-        # selected_wvs = [WaveVariable(wdf, var) for var in multivariables]
+        start_time = wdf.datetime_min # datetime.fromtimestamp(int(wdf.time_min))
+        end_time = wdf.datetime_max # datetime.fromtimestamp(int(wdf.time_max))
 
-        mydict = {'time': wdf.time}
+        time_range = st.slider('Select time range', start_time, end_time, (start_time, end_time))
+        st.write(f'Start time: {time_range[0]}')
+        st.write(f'End time: {time_range[1]}')
+
+        mydict = {'time': wdf.datetime}
         for mv in multivariables:
             temp_var = WaveVariable(wdf, mv)
             mydict[mv] = temp_var.get_time_history_at_coords(
@@ -127,6 +129,12 @@ if radio_selection == 'Time series':
 
         st.write(df)
 
+        show_chart = st.checkbox('Show chart', value=False)
+        if show_chart:
+            st.line_chart(df, x='time', y=multivariables)
+
         st.download_button('Download CSV', df.to_csv(
             index=False), 'data.csv', 'text/csv')
         # df.to_csv('data.csv', index=False)
+
+
