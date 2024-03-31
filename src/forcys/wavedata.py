@@ -86,9 +86,9 @@ class WaveVariable:
         return self.values.max()
 
     def get_time_history_at_indices(
-            self, lat_index: int, lon_index: int,
-            start_date_index: int = 0,
-            end_date_index: int = -1) -> np.ma.masked_array:
+            self, lat_index: int, lon_index: int) -> np.ma.masked_array:
+            # start_date_index: int = 0,
+            # end_date_index: int = -1) -> np.ma.masked_array:
         """
         Get values from a masked array at specified indices across all arrays.
 
@@ -100,7 +100,8 @@ class WaveVariable:
             np.ma.masked_array: Array of values at the specified coord indices
                                 for each time step.
         """
-        values = self.values[start_date_index:end_date_index, lat_index, lon_index]
+        values = self.values[:, lat_index, lon_index]
+        # values = self.values[start_date_index:end_date_index, lat_index, lon_index]
         return values
 
     def get_time_history_at_coords(
